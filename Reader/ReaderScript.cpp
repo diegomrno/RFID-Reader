@@ -38,8 +38,6 @@ void loop()
     SoftSerial.write(Serial.read()); 
 }
 
-
-
 /*
  * // RFID HANDLER API //
     Hardware Requirements :
