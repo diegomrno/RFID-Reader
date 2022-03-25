@@ -1,6 +1,4 @@
 /*
-    Buzzer on Socket D6
-    RFID Reader on Socket D2
 */
  
 #include <SoftwareSerial.h>
@@ -27,10 +25,11 @@ void loop()
     {
         while(SoftSerial.available())               
         {
+            ClearLeds();
             buffer[count++] = SoftSerial.read();      
             if(count == 64)break;
-            checkRfidCode(buffer);
-            }
+            RfidCatcher(buffer);
+        }
         Serial.write(buffer, count);    
         clearBufferArray();             
         count = 0;                      
@@ -39,41 +38,70 @@ void loop()
     SoftSerial.write(Serial.read()); 
 }
 
-void checkRfidCode(char rfid){
-  if(rfid == rfid){
-      GreenLightOn(LedTime);
-      Alarm(1);
-  }
-  else {
-      RedLightOn(LedTime);
-  }
+
+
+/*
+ * // RFID HANDLER API //
+    Hardware Requirements :
+    Generic system for better adapation
+*/
+
+// Catch RFID Code
+void RfidCatcher(char rfid){
+            Alarm();
+            if(analyseRFID(rfid) == true){
+                 digitalWrite(GreenLed, HIGH);
+            }
 }
 
-void GreenLightOn(int time){
-  digitalWrite(GreenLed, HIGH);
-  delay(time);
-  digitalWrite(GreenLed, LOW);
-}
-
-void RedLightOn(int time){
-  digitalWrite(RedLed, HIGH);
-  delay(time);
-  digitalWrite(RedLed, LOW);
-  Alarm(3);
-}
-
-void Alarm(int reccurence){
-  for(int i = 0; i >= reccurence; i++){
-    digitalWrite(6, HIGH);
-    delay(15);
-    digitalWrite(6, LOW);
+// Analyse collected data
+bool analyseRFID(char rfidToAnalyse){
+  if(rfidToAnalyse == rfidToAnalyse){
+    return true;
   }
 }
 
-void clearBufferArray()                 
-{
-    for (int i=0; i<count; i++)
-    {
+// Clear Buffer
+void clearBufferArray(){
+    for (int i=0; i<count; i++){
         buffer[i]=NULL;
     }                  
+}
+
+/*
+ * 
+ * // LOW LEVEL API (Hardware Support //
+    Hardware Requirements :
+
+    - Arduino Uno
+    - Base Shield V2 (Groove)
+    - Leds
+    - Buzzer 
+    - RFID Reader
+    (- Distant server for save RFID users)
+     
+    D2 = RFID Reader
+    D4 = Green Led
+    D6 = Buzzer
+    D8 = Red Led
+*/
+
+void GreenLightOn(){
+  digitalWrite(GreenLed, HIGH);
+}
+
+void RedLightOn(){
+  digitalWrite(RedLed, HIGH);
+}
+
+void ClearLeds(){
+  digitalWrite(GreenLed, LOW);
+  digitalWrite(RedLed, LOW);
+}
+
+void Alarm(){
+
+            digitalWrite(6, HIGH);
+            delay(5);
+            digitalWrite(6, LOW);
 }
