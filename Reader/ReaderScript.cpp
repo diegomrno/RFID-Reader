@@ -25,7 +25,7 @@ void loop()
     {
         while(SoftSerial.available())               
         {
-            ClearLeds();
+            clearLeds();
             buffer[count++] = SoftSerial.read();      
             if(count == 64)break;
             RfidCatcher(buffer);
@@ -37,6 +37,8 @@ void loop()
     if (Serial.available())             
     SoftSerial.write(Serial.read()); 
 }
+
+
 
 /*
  * // RFID HANDLER API //
@@ -50,10 +52,14 @@ void RfidCatcher(char rfid){
             if(analyseRFID(rfid) == true){
                  digitalWrite(GreenLed, HIGH);
             }
+            else{
+                 digitalWrite(RedLed, HIGH);
+            }
 }
 
 // Analyse collected data
 bool analyseRFID(char rfidToAnalyse){
+  char code = '';
   if(rfidToAnalyse == rfidToAnalyse){
     return true;
   }
