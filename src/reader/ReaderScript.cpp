@@ -2,7 +2,14 @@
 */
  
 #include <SoftwareSerial.h>
- 
+#include <Wire.h>
+#include "rgb_lcd.h"
+
+rgb_lcd lcd;
+
+const int colorR = 255;
+const int colorG = 255;
+const int colorB = 255;
 SoftwareSerial SoftSerial(2, 3);
 unsigned char buffer[64];      
 int RedLed = {8};   
@@ -12,6 +19,14 @@ int LedTime(50);
  
 void setup()
 {
+  
+    // set up the LCD's number of columns and rows:
+    lcd.begin(16, 2);
+
+    lcd.setRGB(colorR, colorG, colorB);
+
+    // Print a message to the LCD.
+    lcd.print("Insane Viper");
     SoftSerial.begin(9600);   
     Serial.begin(9600);    
     pinMode(6, OUTPUT);
@@ -21,11 +36,13 @@ void setup()
  
 void loop()
 {
+  
+    lcd.setCursor(0, 1);
     if (SoftSerial.available())              
     {
         while(SoftSerial.available())               
         {
-            clearLeds();
+            ClearLeds();
             buffer[count++] = SoftSerial.read();      
             if(count == 64)break;
             RfidCatcher(buffer);
@@ -50,16 +67,19 @@ void loop()
 void RfidCatcher(char rfid){
             Alarm();
             if(analyseRFID(rfid) == true){
+                 lcd.print("OK !");
                  digitalWrite(GreenLed, HIGH);
+                 lcd.setRGB(0, 255, 0);
             }
             else{
+                 lcd.print("Accès refusé !");
                  digitalWrite(RedLed, HIGH);
+                 lcd.setRGB(255, 0, 0);
             }
 }
 
 // Analyse collected data
 bool analyseRFID(char rfidToAnalyse){
-  char code = '';
   if(rfidToAnalyse == rfidToAnalyse){
     return true;
   }
@@ -76,7 +96,6 @@ void clearBufferArray(){
  * 
  * // LOW LEVEL API (Hardware Support //
     Hardware Requirements :
-
     - Arduino Uno
     - Base Shield V2 (Groove)
     - Leds
